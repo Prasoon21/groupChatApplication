@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up Page</title>
+    <script src="../public/js/signup.js"></script>
+</head>
+<body>
+    <h1>Signup Page</h1>
+
+    <form id="signup-form" action="http://localhost:3000/user/signup" method="POST" onsubmit="signUp(event)">
+        <label for="fname">Enter name:</label>
+        <input type="text" name="fname" id="fname" required>
+
+        <label for="email">Enter E-mail: </label>
+        <input type="email" name="email" id="emailid" required>
+
+        <label for="phn">Enter Phone No.</label>
+        <input type="number" name="phn" id="phoneno" required>
+
+        <label for="pass">Enter password</label>
+        <input type="password" name="pass" id="passid" required>
+
+        <button type="submit">Sign Up</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</body>
+</html>
