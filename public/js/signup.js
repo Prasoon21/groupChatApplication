@@ -1,18 +1,20 @@
-async function signup(event){
+async function signUp(event){
     try{
         event.preventDefault();
 
-        const fname = document.getElementById('fname');
-        const emailId = document.getElementById('emailid');
-        const phoneNo = document.getElementById('phoneno');
-        const passId = document.getElementById('passid');
+        const fname = document.getElementById('fname').value;
+        const emailId = document.getElementById('emailid').value;
+        const phoneNo = document.getElementById('phoneno').value;
+        const passId = document.getElementById('passid').value;
 
+        
         const user = {
             fname: fname,
             emailId: emailId,
             phoneNo: phoneNo,
             passId: passId
         }
+        console.log(user)
 
         const res = await axios.post("http://localhost:3000/user/signup", user);
 

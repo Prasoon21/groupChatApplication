@@ -1,5 +1,55 @@
 const path = require('path');
 const rootDir = require('../util/path');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const userController = require('./userController');
+
+const User = require('../models/user');
+
+exports.generateAccessToken = (id, name) => {
+    return jwt.sign({ userId: id, name: name}, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMTE3MzUsInVzZXJuYW1lIjoiYXV0aCIsImV4cCI6MTY0NTUyNzU2Nn0.0GbT7lbOMNZ1LHBr6XrJlC-WTb7iHWaGT8bln3RE_6c');
+};
+
+exports.postLogin = async(req, res, next) => {
+    try{
+        console.log('Received Post for login: ', req.body);
+        const {emailId, passId} = req.body;
+
+        if(!emailId){
+            console.log("emailId is missing");
+            return res.status(400).json({ error: "emailId is missing", message: "emailId is missing" });
+
+        }
+
+        const user = await User.findAll({ where: { emailId }});
+
+        if(user.length > 0){
+            bcrypt.compare(passId, user[0].passId, (err, result) => {
+                if(err){
+                    console.log('ye error h: ', err);
+                    res.status(500).json({success: false, message: 'something went wrong'});
+                }
+                else if(result === true){
+                    res.status(200).json({success: true, message: 'User logged in successfully', token: userController.generateAccessToken(user[0].id, user[0].name)});
+                }
+                else{
+                    console.log("Password not match");
+                    return res.status(401).json({ error: "Password incorrect", message: "Password incorrect" });
+                }
+            })
+        } else{
+            console.log("emailId not found");
+            return res.status(404).json({ error: "emailId not found", message: "emailId not found" });
+        }
+    } catch(error){
+        console.error("Error in login User: ", error);
+        res.status(500).json({ error: "Error in login User" });
+    }
+};
+
+exports.getLogin = async(req, res, next) => {
+    res.sendFile(path.join(rootDir, 'views', 'login.html'));
+};
 
 exports.getSignUp = async (req, res, next) => {
     res.sendFile(path.join(rootDir, 'views', 'signup.html'));
@@ -7,11 +57,44 @@ exports.getSignUp = async (req, res, next) => {
 
 exports.postSignUp = async (req, res, next) => {
     try{
-        console.log('Received POST reuest for signing user: ', req.body);
+        console.log('Received POST request for signing user: ', req.body);
+        
+        const {fname, emailId, passId } = req.body;
 
-        //const {fname, emailId, phoneNo, passId } = req.body;
+        const phoneNo = parseInt(req.body.phoneNo);
 
-        res.status(200).json({success: true, message: "User signed up successfully"});
+        const existingUser = await User.findOne({
+            where: { emailId: emailId }
+        });
+
+        console.log('Existing User: ', existingUser);
+
+        if(existingUser){
+            console.error("emailId already in use");
+            return res.status(400).json({ error: "emailId already in use", message:"emailId already in use"});
+
+        }
+
+        console.log('ye number kesa h:', typeof(phoneNo));
+        const hashedPassword = await new Promise((resolve, reject) => {
+            bcrypt.hash(passId, 10, (err, hash) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(hash);
+                }
+            });
+        });
+
+        await User.create({
+            fname: fname,
+            emailId: emailId,
+            phoneNo: phoneNo,
+            passId: hashedPassword
+        });
+
+        console.log('updated success');
+        res.status(201);
     } catch(error) {
         console.error("Error Creating User: ", error);
         res.status(500).json({ error: "Error Creating User" });

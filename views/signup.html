@@ -4,27 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up Page</title>
-    <script src="../public/js/signup.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+        integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous" />
+    <link rel="stylesheet" type="text/css" href="/css/signup.css">
+    <script src="/js/signup.js"></script>
+        
+
 </head>
 <body>
-    <h1>Signup Page</h1>
-
-    <form id="signup-form" action="http://localhost:3000/user/signup" method="POST" onsubmit="signUp(event)">
-        <label for="fname">Enter name:</label>
-        <input type="text" name="fname" id="fname" required>
-
-        <label for="email">Enter E-mail: </label>
-        <input type="email" name="email" id="emailid" required>
-
-        <label for="phn">Enter Phone No.</label>
-        <input type="number" name="phn" id="phoneno" required>
-
-        <label for="pass">Enter password</label>
-        <input type="password" name="pass" id="passid" required>
-
-        <button type="submit">Sign Up</button>
-    </form>
+    <nav class="navbar">
+        <h1>Group Chat App</h1>
+    </nav>
+    <div id="main" class="container">
+        <form id="signup-form" action="http://localhost:3000/user/signup" method="POST" onsubmit="signUp(event)">
+            <div class="form-floating">
+                <label for="fname">Enter name:</label>
+                <input type="text" class="mr-2 mb-2 mt-2" name="fname" id="fname" required>
+            </div>
+            
+            <div class="form-floating">
+                <label for="email">Enter E-mail: </label>
+                <input type="email" class="mr-2 mb-2 mt-2" name="emailId" id="emailid" required>
+            </div>
+    
+            <div class="form-floating">
+                <label for="phn">Enter Phone No.</label>
+                <input type="number" class="mr-2 mb-2 mt-2" name="phoneNo" id="phoneno" required>
+            </div>
+    
+            <div class="form-floating">
+                <label for="pass">Enter password</label>
+                <input type="password" class="mr-2 mb-2 mt-2" name="passId" id="passid" required>
+            </div>
+    
+            <button type="submit" class="btn">Sign Up</button>
+        </form>
+    </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+
 </body>
 </html>

@@ -1,0 +1,22 @@
+body{
+    font-size:large;
+    background-color:rgba(190, 186, 72, 0.715);
+}
+
+.container{
+    text-align: center;
+    margin-top: 10px;
+}
+
+.btn{
+    margin-top: 10px;
+    background-color: rgba(151, 184, 173, 0.795);
+}
+
+.btn:hover{
+    background-color: azure;
+}
+
+.navbar{
+    background-color: cornsilk;
+}
