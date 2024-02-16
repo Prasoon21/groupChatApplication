@@ -10,4 +10,6 @@ route.get('/login', userController.getLogin);
 route.post('/signup', userController.postSignUp);
 route.get('/signup', userController.getSignUp);
 
+route.post('/logout', userController.postLogout);
+
 module.exports = route;

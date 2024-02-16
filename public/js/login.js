@@ -34,7 +34,7 @@ async function login(event){
 }
 
 const forgotpswButton = document.getElementById('forgotpsw');
-console.log('ye to nahi', forgotpswButton);
+
 
 forgotpswButton.onclick = async function () {
     try{

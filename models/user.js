@@ -19,6 +19,10 @@ const User = sequelize.define('user', {
     passId:{
         type:Sequelize.STRING,
         allowNull:false
+    },
+    loggedIn: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     }
 });
 

@@ -6,8 +6,8 @@ const userController = require('./userController');
 
 const User = require('../models/user');
 
-exports.generateAccessToken = (id, name) => {
-    return jwt.sign({ userId: id, name: name}, process.env.TOKEN_SECRET);
+exports.generateAccessToken = (id, name, emailId, loggedIn) => {
+    return jwt.sign({ userId: id, name: name, emailId: emailId, loggedIn: loggedIn}, process.env.TOKEN_SECRET);
 };
 
 exports.postLogin = async(req, res, next) => {
@@ -21,16 +21,17 @@ exports.postLogin = async(req, res, next) => {
 
         }
 
-        const user = await User.findAll({ where: { emailId }});
+        const user = await User.findOne({ where: { emailId }});
 
-        if(user.length > 0){
-            bcrypt.compare(passId, user[0].passId, (err, result) => {
+        if(user){
+            bcrypt.compare(passId, user.passId, async (err, result) => {
                 if(err){
                     console.log('ye error h: ', err);
                     res.status(500).json({success: false, message: 'something went wrong'});
                 }
                 else if(result === true){
-                    res.status(200).json({success: true, message: 'User logged in successfully', token: userController.generateAccessToken(user[0].id, user[0].name)});
+                    await User.update({ loggedIn: true }, { where: { emailId } });
+                    res.status(200).json({success: true, message: 'User logged in successfully', token: userController.generateAccessToken(user.id, user.fname, user.emailId, user.loggedIn)});
                 }
                 else{
                     console.log("Password not match");
@@ -49,6 +50,25 @@ exports.postLogin = async(req, res, next) => {
 
 exports.getLogin = async(req, res, next) => {
     res.sendFile(path.join(rootDir, 'views', 'login.html'));
+};
+
+exports.postLogout = async(req, res, next) => {
+    try{
+        const { emailId } = req.body;
+        console.log('email: ', emailId);
+        if(!emailId){
+            console.log("emailId is missing");
+            return res.status(400).json({ error: "emailId is missing", message: "emailId is missing" });
+        }
+
+        await User.update({ loggedIn: false}, { where: { emailId } });
+
+        res.status(200).json({ success: true, message: 'User logged out successfully' });
+
+    } catch(err) {
+        console.error("Error in logout User: ", err);
+        res.status(500).json({ error: "Error in logout User" });
+    }
 };
 
 exports.getSignUp = async (req, res, next) => {
@@ -100,3 +120,4 @@ exports.postSignUp = async (req, res, next) => {
         res.status(500).json({ error: "Error Creating User" });
     }
 }
+

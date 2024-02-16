@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+        integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous" />
+    <link rel="stylesheet" type="text/css" href="/css/signup.css">
+    <link rel="stylesheet" type="text/css" href="/css/chats.css">
+    
+    <script src="/js/chats.js"></script>
+    <title>Chats</title>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>Group Chat App</h1>
+        <button class="btn" id="logout-btn" onclick="logout()">Logout</button>
+    </nav>
+    <div class="messages" id="messagesContainer">
+
+    </div>
+    <div class="message-input-container">
+        <input type="text" class="message-input" id="messageInput" placeholder="Type your message here">
+        <button class="btn" id="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/dist/jwt-decode.min.js"></script>
+</body>
+</html>
