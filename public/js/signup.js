@@ -20,14 +20,20 @@ async function signUp(event){
 
         console.log(res);
 
-        document.getElementById('fname') = '';
-        document.getElementById('emailid') = '';
-        document.getElementById('phoneno') = '';
-        document.getElementById('passid') = '';
+        document.getElementById('fname').value = '';
+        document.getElementById('emailid').value = '';
+        document.getElementById('phoneno').value = '';
+        document.getElementById('passid').value = '';
 
         alert('User signed up successfully');
     } catch(error){
-        document.body.innerHTML += "<h4>Something went wrong</h4>";
-        console.log(error);
+        if(error.response && error.response.status === 400){
+            alert('User already exists, try using different email-id');
+            
+        } else{
+            document.body.innerHTML += "<h4>Something went wrong</h4>";
+            console.log(error);
+        }
+        
     }
 }

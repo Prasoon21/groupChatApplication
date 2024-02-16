@@ -7,6 +7,8 @@ const app = express();
 const cors = require('cors');
 
 const userRoute = require('./routes/userRoute');
+const chatRoute = require('./routes/chatRoute');
+const resetPasswordRoute = require('./routes/resetPassword');
 
 const sequelize = require('./util/database');
 
@@ -18,6 +20,8 @@ app.use(cors());
 app.use(express.static('public'));
 
 app.use('/user', userRoute);
+app.use('/chat', chatRoute);
+app.use('/password', resetPasswordRoute);
 
 sequelize.sync()
     .then(() => {

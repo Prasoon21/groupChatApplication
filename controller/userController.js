@@ -7,7 +7,7 @@ const userController = require('./userController');
 const User = require('../models/user');
 
 exports.generateAccessToken = (id, name) => {
-    return jwt.sign({ userId: id, name: name}, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMTE3MzUsInVzZXJuYW1lIjoiYXV0aCIsImV4cCI6MTY0NTUyNzU2Nn0.0GbT7lbOMNZ1LHBr6XrJlC-WTb7iHWaGT8bln3RE_6c');
+    return jwt.sign({ userId: id, name: name}, process.env.TOKEN_SECRET);
 };
 
 exports.postLogin = async(req, res, next) => {
@@ -94,7 +94,7 @@ exports.postSignUp = async (req, res, next) => {
         });
 
         console.log('updated success');
-        res.status(201);
+        res.status(201).json({message: 'Successfully Create new user'});
     } catch(error) {
         console.error("Error Creating User: ", error);
         res.status(500).json({ error: "Error Creating User" });
