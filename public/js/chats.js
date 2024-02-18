@@ -137,6 +137,10 @@ window.onload = async function (){
     const fetchedActiveUsers = await fetchActiveUsers();
     updateActiveUsersUI(fetchedActiveUsers);
     await fetchMessages();
+
+    setInterval(async () => {
+        await fetchMessages();
+    }, 1000);
 }
 
 function parseJwt (token) {
