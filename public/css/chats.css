@@ -1,6 +1,6 @@
 .messages {
    
-    height: calc(100% - 60px);
+    height: calc(100vh - 150px);
     overflow-y: scroll;
     padding: 10px;
     margin-bottom: 20px;

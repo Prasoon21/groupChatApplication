@@ -2,6 +2,16 @@ let token = localStorage.getItem('token');
 let activeUsers = [];
 let joinedUsers = new Set();
 
+
+function getStoredMessages() {
+    const storedMessages = localStorage.getItem('messages');
+    return storedMessages ? JSON.parse(storedMessages) : [];
+}
+
+function saveMessages(messages) {
+    localStorage.setItem('messages', JSON.stringify(messages));
+}
+
 axios.get('http://localhost:3000/user/activeUsers')
     .then(response => {
         console.log('API response: ', response.data.activeUsers[0])
@@ -120,27 +130,54 @@ async function fetchActiveUsers() {
     }
 }
 
-async function fetchMessages() {
+async function fetchMessagesFromDatabase() {
     try{
         const response = await axios.get('http://localhost:3000/chat/getMessages');
-        const messages = response.data;
+        const dbMessages = response.data;
 
-        messages.forEach(chat => {
-            displayMessage(chat.name, chat.message);
+        const storedMessages = getMessagesFromLocalStorage();
+        const lastStoredMessageId = storedMessages.length > 0 ? storedMessages[storedMessages.length - 1].id : 0;
+
+        const newMessages = dbMessages.filter(message => message.id > lastStoredMessageId);
+
+        const updatedMessages = [...storedMessages, ...newMessages];
+
+        saveMessages(updatedMessages);
+
+        updatedMessages.forEach(message => {
+            displayMessage(message.name, message.message);
         });
-    } catch(err){
+    }
+     catch(err){
         console.error("Error fetching messages: ", err);
+    }
+}
+
+function getMessagesFromLocalStorage() {
+    const messages = JSON.parse(localStorage.getItem('messages'));
+    return messages ? messages : [];
+}
+
+async function getAllMessages() {
+    const localStorageMessages = getMessagesFromLocalStorage();
+    
+    // Fetch messages from database only if local storage messages are not enough
+    if (localStorageMessages.length < 10) {
+        const dbMessages = await fetchMessagesFromDatabase();
+        return [...localStorageMessages, ...dbMessages];
+    } else {
+        return localStorageMessages;
     }
 }
 
 window.onload = async function (){
     const fetchedActiveUsers = await fetchActiveUsers();
     updateActiveUsersUI(fetchedActiveUsers);
-    await fetchMessages();
+    await fetchMessagesFromDatabase();
 
-    setInterval(async () => {
-        await fetchMessages();
-    }, 1000);
+    // setInterval(async () => {
+    //     await fetchMessagesFromDatabase();
+    // }, 1000);
 }
 
 function parseJwt (token) {
