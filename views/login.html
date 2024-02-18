@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
         integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous" />
     <link rel="stylesheet" type="text/css" href="/css/signup.css">    
-
+    <script src="/js/login.js"></script>
     
 </head>
 <body>
@@ -19,15 +19,15 @@
         <form id="loginform" method="POST" action="http://localhost:3000/user/login" onsubmit="login(event)">
             <div class="form-floating">
                 <label for="email">Email Id: </label>
-                <input type="email" class="mr-2 mt-2 mb-2" name="emailid" id="emailid" required>
+                <input type="email" class="mr-2 mt-2 mb-2" name="emailId" id="emailid" required>
             </div>
 
             <div class="form-floating">
                 <label for="pass">Password: </label>
-                <input type="password" class="mr-2 mt-2 mb-2" name="passid" id="passid" required>
+                <input type="password" class="mr-2 mt-2 mb-2" name="passId" id="passid" required>
             </div>
 
-            <button class="btn" type="submit">Login</button>
+            <button class="btn" type="submit" onsubmit="login(event)">Login</button>
         </form>
         <button class="btn" id="forgotpsw">Forgot Password?</button>
     </div>
@@ -37,6 +37,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/js/login.js"></script>
+    
 </body>
 </html>

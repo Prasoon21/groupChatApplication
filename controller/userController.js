@@ -3,6 +3,7 @@ const rootDir = require('../util/path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const userController = require('./userController');
+let activeUsers = [];
 
 const User = require('../models/user');
 
@@ -12,9 +13,9 @@ exports.generateAccessToken = (id, name, emailId, loggedIn) => {
 
 exports.postLogin = async(req, res, next) => {
     try{
-        console.log('Received Post for login: ', req.body);
+        console.log('Received Post for login: ', req.body.emailId);
         const {emailId, passId} = req.body;
-
+        console.log('email aana chahiye: ', emailId);
         if(!emailId){
             console.log("emailId is missing");
             return res.status(400).json({ error: "emailId is missing", message: "emailId is missing" });
@@ -31,7 +32,13 @@ exports.postLogin = async(req, res, next) => {
                 }
                 else if(result === true){
                     await User.update({ loggedIn: true }, { where: { emailId } });
-                    res.status(200).json({success: true, message: 'User logged in successfully', token: userController.generateAccessToken(user.id, user.fname, user.emailId, user.loggedIn)});
+                    activeUsers.push(user.id);
+                    
+                    for(const active of activeUsers){
+                        console.log('active userId after login: ', active);
+                    }
+                    
+                    res.status(200).json({success: true, message: 'User logged in successfully', activeUsers: Array.from(activeUsers), token: userController.generateAccessToken(user.id, user.fname, user.emailId, user.loggedIn)});
                 }
                 else{
                     console.log("Password not match");
@@ -60,10 +67,20 @@ exports.postLogout = async(req, res, next) => {
             console.log("emailId is missing");
             return res.status(400).json({ error: "emailId is missing", message: "emailId is missing" });
         }
+        const user = await User.findOne({ where: { emailId }});
 
         await User.update({ loggedIn: false}, { where: { emailId } });
+        
+        const index = activeUsers.indexOf(user.id);
+        if(index !== -1){
+            activeUsers.splice(index, 1);
+        }
 
-        res.status(200).json({ success: true, message: 'User logged out successfully' });
+        for(const active of activeUsers){
+            console.log('active userId after logout: ', active);
+        }
+
+        res.status(200).json({ success: true, message: 'User logged out successfully', activeUsers: Array.from(activeUsers) });
 
     } catch(err) {
         console.error("Error in logout User: ", err);
@@ -121,3 +138,13 @@ exports.postSignUp = async (req, res, next) => {
     }
 }
 
+exports.getActiveUsers = async(req, res, next) => {
+    const activeUsersFromDB = await User.findAll({ where: { id: activeUsers } });
+
+    const activeUsersWithName = activeUsersFromDB.map(user => ({ id: user.id, name: user.fname}));
+
+
+    console.log('getting active users: ', activeUsersFromDB);
+    console.log('names of active: ', activeUsersWithName);
+    res.json({activeUsers: activeUsersWithName});
+}

@@ -1,21 +1,100 @@
+let token = localStorage.getItem('token');
+let activeUsers = [];
 
-
-function sendMessage() {
-        const messageInput = document.getElementById('messageInput');
+axios.get('http://localhost:3000/user/activeUsers')
+    .then(response => {
+        console.log('API response: ', response.data.activeUsers[0])
+        const activeUsers = response.data.activeUsers;
+        updateActiveUsersUI(activeUsers, '');
         
-        const message = messageInput.value.trim();
-        console.log('sent message --> ', message)
+    })
+    .catch(err => {
+        console.error("Error fetching active users: ", err);
+});
+
+
+const decodedToken = parseJwt(token);
+console.log('decode ye aaya: ', decodedToken)
+const currentUser = decodedToken.name;
+
+function sendMessage(name = currentUser){
+    const messageInput = document.getElementById('messageInput');
+        
+    const trimmedMessage = messageInput.value.trim();
+
+    sendMessages(name, trimmedMessage)
+    storeMessageLoclly(name, trimmedMessage);
+}
+
+function storeMessageLoclly(name, message){
+    let storedMessages = JSON.parse(localStorage.getItem('messages')) || [];
+    storedMessages.push({ name, message });
+
+    localStorage.setItem('messages', JSON.stringify(storedMessages));
+}
+
+window.onload = function() {
+    let storedMessages = JSON.parse(localStorage.getItem('messages')) || [];
+
+    storedMessages.forEach(({ name, message }) => {
+        sendMessages(name, message);
+    });
+}
+function sendMessages(name, message) {
+        
+        
+        console.log('current: ', currentUser);
+
+        console.log('called parameter: ', name)
         if(message !== ''){
+            console.log('sent message --> ', message);
             const messagesContainer = document.getElementById('messagesContainer');
             const messageElement = document.createElement('div');
             messageElement.classList.add('message');
-            messageElement.textContent = message;
+            
+            
+            if(name === currentUser){
+                messageElement.textContent = `You: ${message}`;
+            } else{
+                messageElement.textContent = `${name}: ${message}`;
+            }
             messagesContainer.appendChild(messageElement);
 
             messageInput.value = '';
 
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        } else{
+            console.log('koi message nhi h');
         }
+
+        updateActiveUsersUI(activeUsers, message);
+}
+
+function updateActiveUsersUI(activeUsers, message){
+    if(Array.isArray(activeUsers)){
+        
+        const messagesContainer = document.getElementById('messagesContainer');
+        activeUsers.forEach(user => {        
+            console.log('active h ye to: ', user)
+            console.log('Received msg: ', message)
+            sendMessage(user.name);
+            const userActive = document.createElement('div');
+            userActive.classList.add('active-user-item');
+            userActive.id = user.id;
+            if(user.name === currentUser){
+                userActive.textContent = `You joined`;
+            } else{
+                userActive.textContent = `${user.name} joined`;
+            }
+            
+            messagesContainer.appendChild(userActive);
+        
+        })
+    } else{
+        console.error('Active users data is not an array:', activeUsers);
+    }
+        
+    
 }
 
 function parseJwt (token) {
@@ -29,8 +108,8 @@ function parseJwt (token) {
 }
 
 function getEmailIdFromToken() {
-    const token = localStorage.getItem('token');
-    console.log('token: ', token);
+    
+    //console.log('token: ', token);
     if(token){
         try{
             var decodedToken = parseJwt(token);
@@ -55,25 +134,31 @@ function getEmailIdFromToken() {
     
 }
 
-function logout() {
-    console.log('logout button clicked');
+async function logout() {
+    try{
+        console.log('logout button clicked');
     
 
-    const emailId = getEmailIdFromToken();
-    console.log('Email Id: ', emailId);
-    
+        const emailId = getEmailIdFromToken();
+        console.log('Email Id: ', emailId);
 
-    axios.post('http://localhost:3000/user/logout', {
-        emailId: emailId
-    })
-    .then(response => {
+        const response = await axios.post('http://localhost:3000/user/logout', {
+            emailId: emailId
+        })
+        activeUsers = response.data.activeUsers;
+        console.log('after logout active user: ', activeUsers);
         console.log('User logged out successfully');
         window.location.href = 'http://localhost:3000/user/login';
-    })
-    .catch(err => {
-        console.log('Error logging out: ', err);
-        window.location.href = 'http://localhost:3000/user/login';
-    })
+       
+    } catch(err){   
+            console.log('Error logging out: ', err);
+            window.location.href = 'http://localhost:3000/user/login';
+        
+    }
+    
+    
+
+    
 
     
 }
