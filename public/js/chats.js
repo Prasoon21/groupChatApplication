@@ -17,29 +17,35 @@ const decodedToken = parseJwt(token);
 console.log('decode ye aaya: ', decodedToken)
 const currentUser = decodedToken.name;
 
-function sendMessage(name = currentUser){
-    const messageInput = document.getElementById('messageInput');
+async function sendMessage(name = currentUser){
+    try{
+        const messageInput = document.getElementById('messageInput');
         
-    const trimmedMessage = messageInput.value.trim();
+        const trimmedMessage = messageInput.value.trim();
+    
+        const chat = {
+            name: name,
+            trimmedMessage: trimmedMessage
+        };
 
-    sendMessages(name, trimmedMessage)
-    storeMessageLoclly(name, trimmedMessage);
+        console.log(chat);
+        const res = await axios.post('http://localhost:3000/chat/message', chat, { headers: { "Authorization": token} });
+        
+        if(res.data && res.data.message && res.data.name) {
+            const sentMessage = res.data.message;
+            const sentbyName = res.data.name;
+            console.log('Sent message: ', sentMessage);
+            console.log('message send by: ', sentbyName);
+            sendMessages(sentbyName, sentMessage);
+        } else{
+            console.log('message data not found in api response');
+        }
+    } catch(err){
+        console.log('error sending message: ', err);
+    }
+    
 }
 
-function storeMessageLoclly(name, message){
-    let storedMessages = JSON.parse(localStorage.getItem('messages')) || [];
-    storedMessages.push({ name, message });
-
-    localStorage.setItem('messages', JSON.stringify(storedMessages));
-}
-
-window.onload = function() {
-    let storedMessages = JSON.parse(localStorage.getItem('messages')) || [];
-
-    storedMessages.forEach(({ name, message }) => {
-        sendMessages(name, message);
-    });
-}
 function sendMessages(name, message) {
         
         
@@ -77,7 +83,7 @@ function updateActiveUsersUI(activeUsers, message){
         activeUsers.forEach(user => {        
             console.log('active h ye to: ', user)
             console.log('Received msg: ', message)
-            sendMessage(user.name);
+            
             const userActive = document.createElement('div');
             userActive.classList.add('active-user-item');
             userActive.id = user.id;
@@ -95,6 +101,36 @@ function updateActiveUsersUI(activeUsers, message){
     }
         
     
+}
+
+async function fetchActiveUsers() {
+    try{
+        const response = await axios.get('http://localhost:3000/user/getActiveUsers')
+        activeUsers = response.data.activeUsers;
+        console.log('from fetching: ', activeUsers);
+        updateActiveUsersUI(activeUsers, '');
+        
+    } catch(err){
+        console.error("Error fetching active users: ", err);
+    }
+}
+
+async function fetchMessaages() {
+    try{
+        const response = await axios.get('http://localhost:3000/chat/getMessages');
+        const messages = response.data;
+
+        messages.forEach(chat => {
+            sendMessages(chat.name, chat.message);
+        });
+    } catch(err){
+        console.error("Error fetching messages: ", err);
+    }
+}
+
+window.onload = async function (){
+    await fetchActiveUsers();
+    await fetchMessaages();
 }
 
 function parseJwt (token) {

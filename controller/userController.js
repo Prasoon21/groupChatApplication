@@ -148,3 +148,4 @@ exports.getActiveUsers = async(req, res, next) => {
     console.log('names of active: ', activeUsersWithName);
     res.json({activeUsers: activeUsersWithName});
 }
+

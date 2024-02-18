@@ -12,5 +12,6 @@ route.get('/signup', userController.getSignUp);
 
 route.post('/logout', userController.postLogout);
 route.get('/activeUsers', userController.getActiveUsers);
+route.get('/getActiveUsers', userController.getActiveUsers);
 
 module.exports = route;

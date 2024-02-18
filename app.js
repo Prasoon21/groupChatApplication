@@ -12,6 +12,11 @@ const resetPasswordRoute = require('./routes/resetPassword');
 
 const sequelize = require('./util/database');
 
+const User = require('./models/user');
+const Chat = require('./models/chats');
+
+User.hasMany(Chat);
+Chat.belongsTo(User);
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
