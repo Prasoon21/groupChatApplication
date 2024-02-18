@@ -1,5 +1,6 @@
 let token = localStorage.getItem('token');
 let activeUsers = [];
+let joinedUsers = new Set();
 
 axios.get('http://localhost:3000/user/activeUsers')
     .then(response => {
@@ -36,7 +37,7 @@ async function sendMessage(name = currentUser){
             const sentbyName = res.data.name;
             console.log('Sent message: ', sentMessage);
             console.log('message send by: ', sentbyName);
-            sendMessages(sentbyName, sentMessage);
+            displayMessage(sentbyName, sentMessage);
         } else{
             console.log('message data not found in api response');
         }
@@ -46,9 +47,8 @@ async function sendMessage(name = currentUser){
     
 }
 
-function sendMessages(name, message) {
-        
-        
+async function displayMessage(name, message) {
+    try{
         console.log('current: ', currentUser);
 
         console.log('called parameter: ', name)
@@ -74,6 +74,10 @@ function sendMessages(name, message) {
         }
 
         updateActiveUsersUI(activeUsers, message);
+    } catch(err) {
+        console.log('error sending message: ', err)
+    }
+        
 }
 
 function updateActiveUsersUI(activeUsers, message){
@@ -83,17 +87,20 @@ function updateActiveUsersUI(activeUsers, message){
         activeUsers.forEach(user => {        
             console.log('active h ye to: ', user)
             console.log('Received msg: ', message)
-            
-            const userActive = document.createElement('div');
-            userActive.classList.add('active-user-item');
-            userActive.id = user.id;
-            if(user.name === currentUser){
-                userActive.textContent = `You joined`;
-            } else{
-                userActive.textContent = `${user.name} joined`;
+            if(!joinedUsers.has(user.name)) {
+                const userActive = document.createElement('div');
+                userActive.classList.add('active-user-item');
+                userActive.id = user.id;
+                if(user.name === currentUser){
+                    userActive.textContent = `You joined`;
+                } else{
+                    userActive.textContent = `${user.name} joined`;
+                }
+                
+                messagesContainer.appendChild(userActive);
+                joinedUsers.add(user.name);
             }
             
-            messagesContainer.appendChild(userActive);
         
         })
     } else{
@@ -104,24 +111,22 @@ function updateActiveUsersUI(activeUsers, message){
 }
 
 async function fetchActiveUsers() {
-    try{
-        const response = await axios.get('http://localhost:3000/user/getActiveUsers')
-        activeUsers = response.data.activeUsers;
-        console.log('from fetching: ', activeUsers);
-        updateActiveUsersUI(activeUsers, '');
-        
-    } catch(err){
+    try {
+        const response = await axios.get('http://localhost:3000/user/getActiveUsers');
+        return response.data.activeUsers;
+    } catch (err) {
         console.error("Error fetching active users: ", err);
+        return [];
     }
 }
 
-async function fetchMessaages() {
+async function fetchMessages() {
     try{
         const response = await axios.get('http://localhost:3000/chat/getMessages');
         const messages = response.data;
 
         messages.forEach(chat => {
-            sendMessages(chat.name, chat.message);
+            displayMessage(chat.name, chat.message);
         });
     } catch(err){
         console.error("Error fetching messages: ", err);
@@ -129,8 +134,9 @@ async function fetchMessaages() {
 }
 
 window.onload = async function (){
-    await fetchActiveUsers();
-    await fetchMessaages();
+    const fetchedActiveUsers = await fetchActiveUsers();
+    updateActiveUsersUI(fetchedActiveUsers);
+    await fetchMessages();
 }
 
 function parseJwt (token) {
