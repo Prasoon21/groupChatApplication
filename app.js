@@ -14,9 +14,13 @@ const sequelize = require('./util/database');
 
 const User = require('./models/user');
 const Chat = require('./models/chats');
+const Forgotpassword = require('./models/forgotpassword');
 
 User.hasMany(Chat);
 Chat.belongsTo(User);
+
+User.hasMany(Forgotpassword);
+Forgotpassword.belongsTo(User);
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));

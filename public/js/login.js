@@ -45,10 +45,7 @@ async function login(event){
     }
 }
 
-const forgotpswButton = document.getElementById('forgotpsw');
-
-
-forgotpswButton.onclick = async function () {
+async function forgotPassword() {
     try{
         window.location.href = 'http://localhost:3000/password/forgotForm';
         console.log('redirecting to forgot password form');

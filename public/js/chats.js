@@ -9,7 +9,8 @@ function getStoredMessages() {
 }
 
 function saveMessages(messages) {
-    localStorage.setItem('messages', JSON.stringify(messages));
+    const latestMessages = messages.slice(-20);
+    localStorage.setItem('messages', JSON.stringify(latestMessages));
 }
 
 axios.get('http://localhost:3000/user/activeUsers')
@@ -136,6 +137,11 @@ async function fetchMessagesFromDatabase() {
         const dbMessages = response.data;
 
         const storedMessages = getMessagesFromLocalStorage();
+        
+        if(storedMessages.length >= 20) {
+            storedMessages.shift();
+        }
+
         const lastStoredMessageId = storedMessages.length > 0 ? storedMessages[storedMessages.length - 1].id : 0;
 
         const newMessages = dbMessages.filter(message => message.id > lastStoredMessageId);
@@ -162,7 +168,7 @@ async function getAllMessages() {
     const localStorageMessages = getMessagesFromLocalStorage();
     
     // Fetch messages from database only if local storage messages are not enough
-    if (localStorageMessages.length < 10) {
+    if (localStorageMessages.length <20) {
         const dbMessages = await fetchMessagesFromDatabase();
         return [...localStorageMessages, ...dbMessages];
     } else {
@@ -172,7 +178,7 @@ async function getAllMessages() {
 
 window.onload = async function (){
     const fetchedActiveUsers = await fetchActiveUsers();
-    updateActiveUsersUI(fetchedActiveUsers);
+    updateActiveUsersUI(fetchedActiveUsers, '');
     await fetchMessagesFromDatabase();
 
     // setInterval(async () => {
