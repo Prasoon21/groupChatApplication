@@ -14,12 +14,12 @@
 }
 
 .message-input-container {
-    position: fixed;
-    bottom: 0;
+    position: relative;
+    bottom: 1;
     left: 0;
     width: 100%;
     background-color: #fff;
-    padding: 10px;
+    padding: 7px;
     box-sizing: border-box;
     border-top: 1px solid #ccc;
 }
@@ -30,7 +30,7 @@
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 #send-btn {
@@ -42,3 +42,77 @@
     border-radius: 5px;
     cursor: pointer;
 }
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#create-grp-form{
+    text-align: center;
+}
+
+.group-list{
+    overflow-y: scroll;
+    height: calc(100vh - 150px);
+}
+
+.group-item{
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.group-item:hover{
+    background-color: #f2f2f2;
+}
+
+.group-item span{
+    font-weight: bold;
+    color: #333;
+}
+
+.container-fluid{
+    
+    position: relative;
+}
+
+.vl{
+    border-left: 2px solid #000000;
+    height: 100%;
+    position: absolute;
+    left: calc(25% - 1px); /* Adjust as needed */
+    margin-left: -1px; /* Half of the border thickness */
+    top: 0;
+    
+}
+

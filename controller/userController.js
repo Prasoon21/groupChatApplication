@@ -149,3 +149,15 @@ exports.getActiveUsers = async(req, res, next) => {
     res.json({activeUsers: activeUsersWithName});
 }
 
+exports.getUser = async(req, res, next) => {
+    try{
+        const allUsers = await User.findAll();
+
+        res.status(201).json(allUsers);
+    } catch(err){
+        console.log('something wrong in fetching users: ', err);
+        res.status(500).json({error: 'something went wrong'});
+    }
+    
+
+}

@@ -1,5 +1,5 @@
 const express = require('express');
-const path = require('path');
+
 
 const route = express.Router();
 const userController = require('../controller/userController');
@@ -13,5 +13,6 @@ route.get('/signup', userController.getSignUp);
 route.post('/logout', userController.postLogout);
 route.get('/activeUsers', userController.getActiveUsers);
 route.get('/getActiveUsers', userController.getActiveUsers);
+route.get('/', userController.getUser);
 
 module.exports = route;

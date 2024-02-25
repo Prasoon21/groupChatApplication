@@ -8,25 +8,66 @@
     <link rel="stylesheet" type="text/css" href="/css/signup.css">
     <link rel="stylesheet" type="text/css" href="/css/chats.css">
     <!-- <script src="/js/login.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/js/chats.js"></script>
+    
     
     <title>Chats</title>
 </head>
 <body>
-    <nav class="navbar">
-        <h1>Group Chat App</h1>
-        <button class="btn" id="logout-btn" onclick="logout()">Logout</button>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a href="#" class="navbar-brand navbar-expand-lg">Group Chat App</a>
+        <div class="navbar-nav">
+            <button class="btn ml-2" id="new-grp" onclick="newGrp()">New Group</button>
+            <button class="btn ml-2" id="logout-btn" onclick="logout()">Logout</button>
+        </div>
     </nav>
-    <div class="messages" id="messagesContainer">
 
+    <div id="form-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create New Group</h2>
+            <form class="form-control" id="create-grp-form" onsubmit="createGroup(event)">
+                <label for="gname">Group Name: </label>
+                <input type="text" id="gname" name="gname"><br>
+                <!-- <label for="gdesc">Group Description: </label>
+                <input type="text" id="gdesc" name="gdesc"><br> -->
+                <div id="select-users">
+                    
+                </div>
+
+                <button type="submit" class="btn btn-light" id="crt-group-btn">Create</button>
+            </form>
+        </div>
     </div>
-    <div class="message-input-container">
-        <input type="text" class="message-input" id="messageInput" placeholder="Type your message here">
-        <button class="btn" id="send-btn" onclick="sendMessage()">Send</button>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left column for group names -->
+            <div class="col-md-3">
+                <div class="group-list" id="grp-list-div">
+                    <!-- Group names will be dynamically added here -->
+                </div>
+            </div>
+            <div class="vl"></div>
+            <!-- Right column for group chats -->
+            <div class="col-md-9">
+                <div class="messages" id="messagesContainer">
+
+                </div>
+
+                <div class="message-input-container" style="display: none;">
+                    <input type="text" class="message-input" id="messageInput" placeholder="Type your message here">
+                    <button class="btn" id="send-btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+   
+    
     
 
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/chats.js"></script>
     
 </body>
 </html>

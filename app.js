@@ -15,9 +15,13 @@ const sequelize = require('./util/database');
 const User = require('./models/user');
 const Chat = require('./models/chats');
 const Forgotpassword = require('./models/forgotpassword');
+const Group = require('./models/group');
 
 User.hasMany(Chat);
 Chat.belongsTo(User);
+
+Group.hasMany(Chat);
+Chat.belongsTo(Group);
 
 User.hasMany(Forgotpassword);
 Forgotpassword.belongsTo(User);
