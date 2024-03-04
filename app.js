@@ -16,6 +16,10 @@ const User = require('./models/user');
 const Chat = require('./models/chats');
 const Forgotpassword = require('./models/forgotpassword');
 const Group = require('./models/group');
+const UserGroup = require('./models/usergroup');
+
+User.belongsToMany(Group, { through: UserGroup });
+Group.belongsToMany(User, { through: UserGroup });
 
 User.hasMany(Chat);
 Chat.belongsTo(User);

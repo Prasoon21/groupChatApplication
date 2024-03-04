@@ -4,7 +4,7 @@ const User = require('../models/user');
 const authenticate = (req, res, next) => { 
     try{
         const token = req.header('Authorization');
-        console.log(token);
+        console.log('ye undefined aa rha kya: ', token);
         const user = jwt.verify(token, process.env.TOKEN_SECRET);
         console.log('user id --->>>>>', user.userId);
         User.findByPk(user.userId).then(user => {
@@ -14,7 +14,7 @@ const authenticate = (req, res, next) => {
 
         }).catch(err => { throw new Error(err) })
     } catch (err){
-        console.log(err);
+        console.log('error from catch: ', err);
         return res.status(401).json({success:false});
     }
 }

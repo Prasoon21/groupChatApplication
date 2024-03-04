@@ -1,11 +1,15 @@
 const path = require('path');
+const { Op } = require('sequelize')
 const rootDir = require('../util/path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const userController = require('./userController');
+
 let activeUsers = [];
 
 const User = require('../models/user');
+const Group = require('../models/group');
+const Chat = require('../models/chats');
 
 exports.generateAccessToken = (id, name, emailId, loggedIn) => {
     return jwt.sign({ userId: id, name: name, emailId: emailId, loggedIn: loggedIn}, process.env.TOKEN_SECRET);
@@ -23,6 +27,7 @@ exports.postLogin = async(req, res, next) => {
         }
 
         const user = await User.findOne({ where: { emailId }});
+        console.log('user login: ', user);
 
         if(user){
             bcrypt.compare(passId, user.passId, async (err, result) => {
@@ -38,7 +43,7 @@ exports.postLogin = async(req, res, next) => {
                         console.log('active userId after login: ', active);
                     }
                     
-                    res.status(200).json({success: true, message: 'User logged in successfully', activeUsers: Array.from(activeUsers), token: userController.generateAccessToken(user.id, user.fname, user.emailId, user.loggedIn)});
+                    res.status(200).json({success: true, message: 'User logged in successfully', activeUsers: activeUsers, token: userController.generateAccessToken(user.id, user.fname, user.emailId, user.loggedIn)});
                 }
                 else{
                     console.log("Password not match");
@@ -67,20 +72,25 @@ exports.postLogout = async(req, res, next) => {
             console.log("emailId is missing");
             return res.status(400).json({ error: "emailId is missing", message: "emailId is missing" });
         }
-        const user = await User.findOne({ where: { emailId }});
+        
 
         await User.update({ loggedIn: false}, { where: { emailId } });
         
+        const user = await User.findOne({ where: { emailId }});
+        console.log('user jisne logout kiya: ', user);
+        
         const index = activeUsers.indexOf(user.id);
+        console.log('index: ', index);
         if(index !== -1){
             activeUsers.splice(index, 1);
+            console.log('after checking: ', activeUsers)
         }
 
         for(const active of activeUsers){
             console.log('active userId after logout: ', active);
         }
 
-        res.status(200).json({ success: true, message: 'User logged out successfully', activeUsers: Array.from(activeUsers) });
+        res.status(200).json({ success: true, message: 'User logged out successfully', activeUsers: activeUsers });
 
     } catch(err) {
         console.error("Error in logout User: ", err);
@@ -139,14 +149,14 @@ exports.postSignUp = async (req, res, next) => {
 }
 
 exports.getActiveUsers = async(req, res, next) => {
-    const activeUsersFromDB = await User.findAll({ where: { id: activeUsers } });
+    const activeUsersFromDB = await User.findAll({ where: { loggedIn: true } });
 
     const activeUsersWithName = activeUsersFromDB.map(user => ({ id: user.id, name: user.fname}));
 
 
     console.log('getting active users: ', activeUsersFromDB);
     console.log('names of active: ', activeUsersWithName);
-    res.json({activeUsers: activeUsersWithName});
+    res.json(activeUsersFromDB);
 }
 
 exports.getUser = async(req, res, next) => {
@@ -160,4 +170,43 @@ exports.getUser = async(req, res, next) => {
     }
     
 
+}
+
+exports.getUserGroup = async(req, res, next) => {
+    const userId = parseInt(req.params.userId);
+
+    try{
+        const userGroups = await Group.findAll({
+            // include: [{
+            //     model: User,
+            //     where: { userId },
+                
+            // }]
+        });
+        res.json({ userGroups });
+    } catch(err){
+        console.error('Error fetching user groups: ', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+exports.searchUsers = async(req, res, next) => {
+    try{
+        const { query } = req.query;
+        console.log('request se: ', query);
+        const users = await User.findAll({
+            where: {
+                [Op.or]: [
+                    { fname: { [Op.like]: `%${query}%` } },
+                    { emailId: { [Op.like]: `%${query}%` } },
+                    { phoneNo: { [Op.like]: `%${query}%` } }
+                ]
+            }
+        });
+        res.status(200).json(users);
+    } catch(error){
+        console.error('Error searching users: ', error);
+        res.status(500).json({ error: 'An error occured while searching for users' });
+        
+    }
 }

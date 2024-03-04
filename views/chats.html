@@ -49,7 +49,13 @@
             </div>
             <div class="vl"></div>
             <!-- Right column for group chats -->
-            <div class="col-md-9">
+            <div class="col-md-9" id="msgCol">
+                <form id="searchForm" style="display: none;">
+                    <input type="text" id="searchQuery" placeholder="Search by name, email, or phone">
+                    <button type="submit">Search</button>
+                </form>
+                <div id="searchResults"></div>
+                
                 <div class="messages" id="messagesContainer">
 
                 </div>
@@ -57,6 +63,12 @@
                 <div class="message-input-container" style="display: none;">
                     <input type="text" class="message-input" id="messageInput" placeholder="Type your message here">
                     <button class="btn" id="send-btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+            <div class="col-md-3" id="membersDiv" style="display: none;">
+                <div id="groupMembers">
+                    <h2>Group Members</h2>
+                    <div id="memberList"></div>
                 </div>
             </div>
         </div>
