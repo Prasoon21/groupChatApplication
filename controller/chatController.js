@@ -134,13 +134,25 @@ exports.getGroupMembers = async(req, res, next) => {
         console.log('group id: ', groupId);
 
         const userGroups = await UserGroup.findAll({ where: { groupId: groupId } });
+        let adminUserId = 0;
+        userGroups.forEach(userGroup => {
+            if(userGroup.isAdmin === true){
+                adminUserId = userGroup.userId;
+            }
+        })
 
         const userIds = userGroups.map(userGroup => userGroup.userId);
 
         const users = await User.findAll({ where: { id: userIds } });
         console.log('users detail of the group: ', users);
+        console.log('admin user id: ', adminUserId);
+        const data = {
+            adminUserId: adminUserId,
+            users: users
+            
+        }
 
-        res.status(201).json(users);
+        res.status(201).json(data);
     } catch(err){
         console.log('error in fetching group members: ', err);
         res.status(500).json({ error: 'error in fetching group members'});
@@ -148,4 +160,43 @@ exports.getGroupMembers = async(req, res, next) => {
     }
     
 
+}
+
+exports.makeAdmin = async(req, res, next) => {
+    try{
+        const { userId, groupId } = req.body;
+        console.log('making this member admin: ', userId);
+        console.log('of this group: ', groupId);
+
+        await UserGroup.update({ isAdmin: true}, {
+            where: {
+                groupId: groupId,
+                userId: userId
+            }
+        })
+
+        res.status(200).json({message: 'making admin successful'});
+    } catch(error){
+        console.log('error in making admin: ', error);
+        res.status(500).json({error: 'error in making admin'});
+    }
+    
+}
+
+exports.removeMember = async(req, res, next) => {
+    try{
+        const { userId, groupId } = req.body;
+        console.log('removing this member: ', userId);
+        console.log('of this group: ', groupId);
+        await UserGroup.destroy({
+            where: {
+                userId: userId,
+                groupId: groupId
+            }
+        });
+        res.status(200).json({message: 'member removed successfully'});
+    } catch(error){
+        console.log('error in removing member: ', error);
+        res.status(500).json({error: 'error in removing member'});
+    }
 }

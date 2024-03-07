@@ -480,21 +480,76 @@ async function displayUserFromGroup(groupId){
 
         console.log('response of members request: ', res.data);
 
-        const users = res.data;
+        const users = res.data.users;
+        const adminUserId = res.data.adminUserId;
+        console.log('admin user id : ', typeof(adminUserId));
+
         memberList.innerHTML = '';
         users.forEach(user => {
             const ul = document.createElement('ul');
             ul.classList.add('listOfMembers');
+            console.log('user id: ', typeof(user.id));
 
             const liChild = document.createElement('li');
-            liChild.textContent = user.fname;
+            liChild.classList.add(`${user.id}`);
+            if(user.id == adminUserId){
+                console.log('equal h:');
+                
+                liChild.textContent = user.fname;
+                liChild.innerHTML += '<i> - admin</i>'
+
+            } else{
+                
+                liChild.textContent = user.fname;
+            }
+            
+            const selectMember = document.createElement('select');
+            selectMember.name = 'memberOption';
+            selectMember.id = 'memberOption';
+            selectMember.innerHTML = `
+                <option value="none">None</option>
+                <option value="makeAdmin">Make Admin</option>
+                <option value="remove">Remove User</option>
+            `;
+
+            selectMember.addEventListener('change', async (event) => {
+                const selectedOption = event.target.value;
+
+                if(selectedOption === 'makeAdmin'){
+                    //make admin logic
+                    const userId = user.id;
+                    try {
+                        console.log('group id in makeadmin: ', groupId)
+                        const res = await axios.post('http://localhost:3000/chat/member/make-admin', { userId, groupId });
+                        console.log('response while making member admin', res.data); // Log the response
+                        
+                        // You can also update the UI here to reflect the changes
+                    } catch (error) {
+                        console.error('Error making user admin: ', error);
+                    }
+                    
+                } else if(selectedOption === 'remove'){
+                    //implement remove logic here
+                    const userId = user.id;
+                    try{
+                        const res = await axios.delete('http://localhost:3000/chat/member/remove-member', { 
+                            data: { userId: userId, groupId: groupId }
+                        });
+                        console.log('response after removing a member: ', res.data);
+                        
+                    } catch(error){
+                        console.log('error in removing member: ', error);
+                        
+                    }
+                }
+            })
+
+            liChild.appendChild(selectMember);
 
             console.log('username in group: ', user.fname);
             memberList.appendChild(ul);
             ul.appendChild(liChild);
         })
-
-
 
     } catch(error){
         console.log('error getting members of group: ', error);

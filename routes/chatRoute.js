@@ -14,5 +14,7 @@ route.post('/create-group',userAuthenticate.authenticate, chatController.createG
 route.get('/get-group',userAuthenticate.authenticate, chatController.getGroups);
 route.post('/add-user-to-group', chatController.addUserToGroup)
 route.get('/groupMember', chatController.getGroupMembers)
+route.post('/member/make-admin', chatController.makeAdmin);
+route.delete('/member/remove-member', chatController.removeMember);
 
 module.exports = route;
