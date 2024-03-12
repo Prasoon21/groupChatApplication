@@ -2,8 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const http = require('http');
+const socketIO = require('socket.io');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
 const cors = require('cors');
 
 const userRoute = require('./routes/userRoute');
@@ -17,6 +21,7 @@ const Chat = require('./models/chats');
 const Forgotpassword = require('./models/forgotpassword');
 const Group = require('./models/group');
 const UserGroup = require('./models/usergroup');
+const { Socket } = require('dgram');
 
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
@@ -40,14 +45,22 @@ app.use('/user', userRoute);
 app.use('/chat', chatRoute);
 app.use('/password', resetPasswordRoute);
 
-sequelize.sync()
-    .then(() => {
-        console.log('Database synced successfully');
-        app.listen(process.env.PORT || 3000, () => {
-            console.log('server is runnnng on port ', process.env.PORT);
-            app.get('/', (req, res) => {
-                res.sendFile(path.join(__dirname, 'views', 'login.html'));
-            })
-        });
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'login.html'));
+})
+
+io.on('connection', (socket) => {
+    console.log('A user connected');
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
     })
-    .catch(err => console.log(err));
+})
+
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+    console.log('server is runnnng on port ', process.env.PORT);
+    
+});
+    
