@@ -1,3 +1,4 @@
+//const { io } = require('../app');
 const express = require('express');
 const path = require('path');
 const rootDir = require('../util/path');
@@ -7,34 +8,38 @@ const UserGroup = require('../models/usergroup')
 const User = require('../models/user')
 const Op = require('sequelize')
 
+
 exports.getDashboard = async(req, res, next) => {
     res.sendFile(path.join(rootDir, 'views', 'chats.html'));
 }
 
-exports.postMessage = async(req, res, next) => {
-    console.log('Received POST request for inserting message: ', req.body);
-    if(!req.body.trimmedMessage){
-        console.log('missing req fields');
-        return res.sendStatus(500);
-    }
+exports.postMessage = async(data, io) => {
+    console.log('Received POST request for inserting message: ', data);
+    // if(!data.trimmedMessage){
+    //     console.log('missing req fields');
+    //     return res.sendStatus(500);
+    // }
 
+    
     try{
-        const { name, trimmedMessage, groupId} = req.body;
-        console.log(trimmedMessage, name, groupId);
+        const { name, trimmedMessage, groupId, userId} = data;
+        console.log('by request: ', trimmedMessage, name, groupId);
 
-        const data = await Chat.create({
+        const chatt = await Chat.create({
             name:name,
             message:trimmedMessage,
-            userId: req.user.id,
+            userId: userId,
             groupId: groupId
         });
 
         console.log('updated success');
 
-        res.status(201).json(data);
+        io.emit('message', chatt);
+
+        // res.status(201).json(chatt);
     } catch(err){
         console.log(err, JSON.stringify(err));
-        res.status(501).json({err});
+        // res.status(501).json({err});
     }
 }
 

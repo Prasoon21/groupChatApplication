@@ -1,17 +1,21 @@
+const socket = io('http://localhost:3000')
+
 const token = localStorage.getItem('token');
 const decodedToken = parseJwt(token);
-console.log('decode ye aaya: ', decodedToken)
 const currentUser = decodedToken.name;
 const currentUserId = decodedToken.userId;
 let lastClickedGroupId;
 let activeUsers = [];
 let joinedUsers = new Set();
 
+socket.on('message', (data) => {
+    console.log('received message via socket: ', data);
+
+    displayMessage(data.name, data.message, data.groupId);
+})
 
 window.addEventListener('DOMContentLoaded', async () => {
     fetchAndDisplayGroupList();
-    // getAllMessages();
-    //updateActiveUsersUI();
     await fetchMessagesFromDatabase()
 })
 
@@ -22,28 +26,34 @@ async function sendMessage(name = currentUser){
         const trimmedMessage = messageInput.value.trim();
         console.log('is group m jaaega msg: ', lastClickedGroupId)
     
+        const userId = decodedToken.userId;
         if(lastClickedGroupId){
             const chat = {
-                name: name,
-                trimmedMessage: trimmedMessage,
-                groupId: lastClickedGroupId
+                "name": name,
+                "trimmedMessage": trimmedMessage,
+                "groupId": lastClickedGroupId,
+                "userId": userId
                 
             };
-    
-            console.log(chat);
-            const res = await axios.post('http://localhost:3000/chat/message', chat, { headers: { "Authorization": token} });
-
-            if(res.data && res.data.message && res.data.name && res.data.groupId) {
-                const sentMessage = res.data.message;
-                const sentbyName = res.data.name;
-                const sentBygroupid = res.data.groupId;
-                console.log('Sent message: ', sentMessage);
-                console.log('message send by: ', sentbyName);
-                console.log('groupid konsi h: ', sentBygroupid);
-                displayMessage(sentbyName, sentMessage, sentBygroupid);
-            } else{
-                console.log('message data not found in api response');
-            }
+            
+            
+            console.log('chat m client:', typeof(chat));
+            // const userId = decodedToken.userId;
+            // console.log('userid emit m jaa rhi h: ', userId);
+            //const res = await axios.post('http://localhost:3000/chat/message', chat, { headers: { "Authorization": token} });
+            socket.emit('sendMessage', chat);
+            
+            // if(res.data && res.data.message && res.data.name && res.data.groupId) {
+            //     const sentMessage = res.data.message;
+            //     const sentbyName = res.data.name;
+            //     const sentBygroupid = res.data.groupId;
+            //     console.log('Sent message: ', sentMessage);
+            //     console.log('message send by: ', sentbyName);
+            //     console.log('groupid konsi h: ', sentBygroupid);
+                
+            // } else{
+            //     console.log('message data not found in api response');
+            // }
         } else{
             console.log('no group selected to send the message');
         }
@@ -82,7 +92,7 @@ async function displayMessage(name, message, groupId) {
         } else{
             console.log('koi message nhi h');
         }
-        await fetchActiveUsers();
+        //await fetchActiveUsers();
         console.log('display function m: ', activeUsers);
         updateActiveUsersUI(activeUsers, message);
     } catch(err) {
