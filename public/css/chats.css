@@ -116,3 +116,57 @@
     
 }
 
+.h4-username{
+    margin-left: 55%;
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .upload-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .upload-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .upload-button i {
+    margin-right: 8px;
+  }
+
+  
+.message-input-container {
+    display: flex;
+    align-items: center;
+}
+
+.inputgroup {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.file-input-wrapper {
+    margin-left: 20px;
+}
+

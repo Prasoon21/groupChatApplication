@@ -12,12 +12,14 @@
     <title>Chats</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light" id="navtag">
         <a href="#" class="navbar-brand navbar-expand-lg">Group Chat App</a>
         <div class="navbar-nav">
             <button class="btn ml-2" id="new-grp" onclick="newGrp()">New Group</button>
             <button class="btn ml-2" id="logout-btn" onclick="logout()">Logout</button>
         </div>
+
+        
     </nav>
 
     <div id="form-modal" class="modal">
@@ -60,8 +62,18 @@
                 </div>
 
                 <div class="message-input-container" style="display: none;">
-                    <input type="text" class="message-input" id="messageInput" placeholder="Type your message here">
-                    <button class="btn" id="send-btn" onclick="sendMessage()">Send</button>
+                    <div class="inputgroup">
+                        <input type="text" class="message-input" id="messageInput" placeholder="Type your message here">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="fileInput" class="file-input" accept="image/*, video/*" />
+                            <button id="uploadButton" class="upload-button-light">
+                            <i class="fa fa-paperclip">📎</i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                      
+                    <button class="btn" id="send-btn" style="width: auto;" onclick="sendMessage()">Send</button>
                 </div>
             </div>
             <div class="col-md-3" id="membersDiv" style="display: none;">

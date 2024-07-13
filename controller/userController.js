@@ -8,8 +8,8 @@ const userController = require('./userController');
 let activeUsers = [];
 
 const User = require('../models/user');
-const Group = require('../models/group');
-const Chat = require('../models/chats');
+// const Group = require('../models/group');
+// const Chat = require('../models/chats');
 
 exports.generateAccessToken = (id, name, emailId, loggedIn) => {
     return jwt.sign({ userId: id, name: name, emailId: emailId, loggedIn: loggedIn}, process.env.TOKEN_SECRET);
@@ -110,19 +110,19 @@ exports.postSignUp = async (req, res, next) => {
 
         const phoneNo = parseInt(req.body.phoneNo);
 
-        const existingUser = await User.findOne({
-            where: { emailId: emailId }
-        });
+        // const existingUser = await User.findOne({
+        //     where: { emailId: emailId }
+        // });
 
-        console.log('Existing User: ', existingUser);
+        //console.log('Existing User: ', existingUser);
 
-        if(existingUser){
-            console.error("emailId already in use");
-            return res.status(400).json({ error: "emailId already in use", message:"emailId already in use"});
+        // if(existingUser){
+        //     console.error("emailId already in use");
+        //     return res.status(400).json({ error: "emailId already in use", message:"emailId already in use"});
 
-        }
+        // }
 
-        console.log('ye number kesa h:', typeof(phoneNo));
+        //console.log('ye number kesa h:', typeof(phoneNo));
         const hashedPassword = await new Promise((resolve, reject) => {
             bcrypt.hash(passId, 10, (err, hash) => {
                 if (err) {
@@ -132,12 +132,12 @@ exports.postSignUp = async (req, res, next) => {
                 }
             });
         });
-
-        await User.create({
-            fname: fname,
-            emailId: emailId,
-            phoneNo: phoneNo,
-            passId: hashedPassword
+        const user = new User(fname, emailId, phoneNo, hashedPassword)
+        await user.save()
+        .then(result => {
+            console.log('Result: ', result);
+        }).catch(err => {
+            console.log(err);
         });
 
         console.log('updated success');

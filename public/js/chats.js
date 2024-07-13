@@ -15,9 +15,50 @@ socket.on('message', (data) => {
 })
 
 window.addEventListener('DOMContentLoaded', async () => {
+    displayUserName();
     fetchAndDisplayGroupList();
-    await fetchMessagesFromDatabase()
+    await fetchMessagesFromDatabase();
+
+
 })
+
+function displayUserName(){
+    const navTag = document.getElementById('navtag');
+    
+    const h4 = document.createElement('h4');
+    h4.classList.add('h4-username');
+    h4.innerHTML = `<i><b>Welcome ${currentUser}</b></i>`;
+    console.log('ye h4 h: ', h4);
+    navTag.appendChild(h4);
+}
+
+const fileInput = document.getElementById('fileInput');
+fileInput.addEventListener('change', handleFileUpload);
+
+function handleFileUpload(event) {
+    const files = event.target.files;
+    // Iterate over selected files and send them to the server
+    for (const file of files) {
+        sendFileToServer(file);
+    }
+}
+
+async function sendFileToServer(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await axios.post('http://localhost:3000/user/uploadFile', { formData: formData });
+        if (response.ok) {
+            console.log('File uploaded successfully');
+        } else {
+            console.error('File upload failed');
+        }
+    } catch (error) {
+        console.error('Error uploading file:', error);
+    }
+}
+
 
 async function sendMessage(name = currentUser){
     try{
@@ -36,30 +77,13 @@ async function sendMessage(name = currentUser){
                 
             };
             
-            
             console.log('chat m client:', typeof(chat));
-            // const userId = decodedToken.userId;
-            // console.log('userid emit m jaa rhi h: ', userId);
-            //const res = await axios.post('http://localhost:3000/chat/message', chat, { headers: { "Authorization": token} });
+        
             socket.emit('sendMessage', chat);
             
-            // if(res.data && res.data.message && res.data.name && res.data.groupId) {
-            //     const sentMessage = res.data.message;
-            //     const sentbyName = res.data.name;
-            //     const sentBygroupid = res.data.groupId;
-            //     console.log('Sent message: ', sentMessage);
-            //     console.log('message send by: ', sentbyName);
-            //     console.log('groupid konsi h: ', sentBygroupid);
-                
-            // } else{
-            //     console.log('message data not found in api response');
-            // }
         } else{
             console.log('no group selected to send the message');
         }
-        
-        
-        
     } catch(err){
         console.log('error sending message: ', err);
     }
@@ -68,9 +92,7 @@ async function sendMessage(name = currentUser){
 
 async function displayMessage(name, message, groupId) {
     try{
-        // console.log('current: ', currentUser);
 
-        // console.log('called parameter: ', name);
         if(message !== ''){
             //console.log('sent message --> ', message);
             const messagesContainer = document.getElementById('messagesContainer');
@@ -93,7 +115,7 @@ async function displayMessage(name, message, groupId) {
             console.log('koi message nhi h');
         }
         //await fetchActiveUsers();
-        console.log('display function m: ', activeUsers);
+        //console.log('display function m: ', activeUsers);
         updateActiveUsersUI(activeUsers, message);
     } catch(err) {
         console.log('error sending message: ', err)
@@ -377,7 +399,7 @@ async function toggleMessageInput(groupId){
     const membersDiv = document.getElementById('membersDiv');
 
     if(messageInputContainer.style.display === 'none'){
-        messageInputContainer.style.display = 'block';
+        messageInputContainer.style.display = 'flex';
         searchForm.style.display = 'block';
         msgCol.classList.remove('col-md-9');
         msgCol.classList.add('col-md-6');
@@ -392,7 +414,7 @@ async function toggleMessageInput(groupId){
         
 
         console.log(`Message input displayed for group ${groupId}`);
-    } else if(messageInputContainer.style.display === 'block'){
+    } else if(messageInputContainer.style.display === 'flex'){
         searchForm.style.display = 'block';
         msgCol.classList.remove('col-md-9');
         msgCol.classList.add('col-md-6');
@@ -504,13 +526,22 @@ async function displayUserFromGroup(groupId){
             liChild.classList.add(`${user.id}`);
             if(user.id == adminUserId){
                 console.log('equal h:');
-                
-                liChild.textContent = user.fname;
+                if(user.id == currentUserId){
+                    liChild.textContent = 'you';
                 liChild.innerHTML += '<i> - admin</i>'
+                } else{
+                    liChild.textContent = user.fname;
+                    liChild.innerHTML += '<i> - admin</i>'
+                }
+                
 
             } else{
+                if(user.id == currentUserId){
+                    liChild.textContent = 'you';
+                } else{
+                    liChild.textContent = user.fname;
+                }
                 
-                liChild.textContent = user.fname;
             }
             
             const selectMember = document.createElement('select');

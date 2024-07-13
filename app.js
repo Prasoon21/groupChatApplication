@@ -11,13 +11,14 @@ const fs = require('fs');
 require('dotenv').config();
 
 //importing the modules
-const sequelize = require('./util/database');
-const User = require('./models/user');
-const Chat = require('./models/chats');
-const Forgotpassword = require('./models/forgotpassword');
-const Group = require('./models/group');
-const UserGroup = require('./models/usergroup');
-const chatController = require('./controller/chatController');
+// const sequelize = require('./util/database');
+//const User = require('./models/user');
+// const Chat = require('./models/chats');
+// const Forgotpassword = require('./models/forgotpassword');
+// const Group = require('./models/group');
+// const UserGroup = require('./models/usergroup');
+const mongoConnect = require('./util/database').mongoConnect;
+// const chatController = require('./controller/chatController');
 
 //importing the services
 const webSocketService = require('./services/webSocket');
@@ -25,8 +26,8 @@ const webSocketService = require('./services/webSocket');
 
 //importing the routes
 const userRoute = require('./routes/userRoute');
-const chatRoute = require('./routes/chatRoute');
-const resetPasswordRoute = require('./routes/resetPassword');
+// const chatRoute = require('./routes/chatRoute');
+// const resetPasswordRoute = require('./routes/resetPassword');
 
 const accessLogStream = fs.createWriteStream('./access.log', { flags: 'a'});
 
@@ -42,8 +43,8 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 app.use('/user', userRoute);
-app.use('/chat', chatRoute);
-app.use('/password', resetPasswordRoute);
+// app.use('/chat', chatRoute);
+// app.use('/password', resetPasswordRoute);
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 })
@@ -77,26 +78,28 @@ io.on('connection', (socket) => {
 instrument(io, { auth: false })
 
 
-User.belongsToMany(Group, { through: UserGroup });
-Group.belongsToMany(User, { through: UserGroup });
+// User.belongsToMany(Group, { through: UserGroup });
+// Group.belongsToMany(User, { through: UserGroup });
 
-User.hasMany(Chat);
-Chat.belongsTo(User);
+// User.hasMany(Chat);
+// Chat.belongsTo(User);
 
-Group.hasMany(Chat);
-Chat.belongsTo(Group);
+// Group.hasMany(Chat);
+// Chat.belongsTo(Group);
 
-User.hasMany(Forgotpassword);
-Forgotpassword.belongsTo(User);
+// User.hasMany(Forgotpassword);
+// Forgotpassword.belongsTo(User);
 
 
 const PORT = process.env.PORT || 3000;
 async function initiate() {
     try{
-        const res = await sequelize.sync({force:false});
-        httpServer.listen(PORT, () => {
-            console.log('server is runnnng on port ', PORT);
-        });
+        mongoConnect(() => {
+            httpServer.listen(PORT, () => {
+                console.log('server is runnnng on port ', PORT);
+            });
+        })
+        
     } catch(error){
         console.error("Error during server initialization: ", error);
         process.exit(1);
